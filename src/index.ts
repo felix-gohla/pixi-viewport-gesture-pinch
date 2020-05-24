@@ -1,5 +1,5 @@
 import { Viewport } from "pixi-viewport";
-import { Point } from "pixi.js";
+import { IPoint, Point } from "pixi.js";
 
 import BasePlugin from "./base-plugin";
 import GestureEvent from "./gesture-event";
@@ -13,7 +13,7 @@ class PinchPlugin extends BasePlugin {
   viewport: Viewport;
   listenerNode: HTMLElement;
   initialScale: number;
-  initialLocalPosition?: Point;
+  initialLocalPosition?: IPoint;
 
   constructor(options: Options) {
     super();
@@ -37,16 +37,19 @@ class PinchPlugin extends BasePlugin {
   }
 
   private onGestureStart = (event: GestureEvent): void => {
+    event.preventDefault();
     this.initialScale = this.viewport.scale.x;
     const initialGlobalPosition = this.viewport.input.getPointerPosition(event);
     this.initialLocalPosition = this.viewport.toLocal(initialGlobalPosition);
   };
 
-  private onGestureEnd = (): void => {
+  private onGestureEnd = (event: GestureEvent): void => {
+    event.preventDefault();
     this.viewport.emit("zoomed", { viewport: this.viewport, type: "pinch" });
   };
 
   private onGestureChange = (event: GestureEvent) => {
+    event.preventDefault();
     if (!this.initialLocalPosition) {
       throw new Error("Missing initial position");
     }
